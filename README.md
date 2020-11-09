@@ -20,7 +20,7 @@ python3 component-status-report.py <iq-url> <iq-username> <iq-password>
     ./datafiles/overrides.json
     ./datafiles/overrides.csv
     ```
-    * output from [https://help.sonatype.com/iqserver/automating/rest-apis/report-related-rest-apis---v2](reports-related rest API)
+    * output from [reports-related rest API](https://help.sonatype.com/iqserver/automating/rest-apis/report-related-rest-apis---v2)
     ```
     ./datafiles/appreports.json
     ./datafiles/appreportsurls.csv
