@@ -20,6 +20,19 @@ python3 component-status-report.py <iq-url> <iq-username> <iq-password>
     ./datafiles/overrides.json
     ./datafiles/overrides.csv
     ```
+    * output from reports-related rest API
+    ```
+    ./datafiles/appreports.json
+    ./datafiles/appreportsurls.csv
+    ./datafiles/apppolicyviolations.csv
+    ./datafiles/appissuesstatus.csv
+    ```
+    * summary report 
+    ```
+    ./datafiles/statussummary.csv
+    ```
+    
+    
     
     
     
