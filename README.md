@@ -15,7 +15,7 @@ python3 component-status-report.py <iq-url> <iq-username> <iq-password>
 ```
 
   * Output files
-    * output from security vulnerability overrides API
+    * output from [security vulnerability overrides API](https://help.sonatype.com/iqserver/automating/rest-apis/security-vulnerability-override-api---v2)
     ```
     ./datafiles/overrides.json
     ./datafiles/overrides.csv
