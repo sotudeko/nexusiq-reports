@@ -123,6 +123,9 @@ def getSecLicIssueLine(componentHash, cve):
     if issueComponentHash == componentHash and issueCve == cve:
       line = info[4] + "," + info[5] + "," + info[6]
       break
+    else:
+      line = ",,"
+      break
 
   return line.rstrip("\n")
 
@@ -167,27 +170,6 @@ def getOverRidesData():
   return statusCode
 
 
-# def getSecurityScore(applicationName, hash, findCve):
-# 	return 1, "none"
-# 	print (secLicIssuesDb)
-# 	for issue in secLicIssuesDb:
-# 		cves = issue[3].split(';')
-# 		licenseStatus = issue[4]
-# 		licenseStatus = licenseStatus[:-1]
-# 		cveScore = 0
-
-# 		for c in cves:
-# 			el = c.split(':')
-# 			cve = el[0]
-# 			status = el[1]
-# 			score = el[2]
-
-# 			if cve == findCve:
-# 				cveScore = score
-
-# 	return cveScore, licenseStatus
-
-
 def getApplicationEvaluationReports():
   # get all application reports info
   statusCode, applicationEvaluations = getNexusIqData('/api/v2/reports/applications')
@@ -213,21 +195,6 @@ def getApplicationEvaluationReports():
 
   print(appReportsUrlsCsvFile)
   return statusCode
-
-
-# def writeAppReportUrlsCsvFile(applicationEvaluations):
-# 	with open(appReportsUrlsCsvFile, 'w') as fd:
-# 			for applicationEvaluation in applicationEvaluations:
-# 				applicationName = getApplicationName(applicationEvaluation["reportDataUrl"])
-# 				applicationReportUrl = applicationEvaluation["reportDataUrl"]
-
-# 				# only write the details if the application has an override
-# 				if applicationHasOverride(applicationName):
-# 					line = applicationName + "," + applicationReportUrl + "\n"
-# 					fd.write(line)
-
-# 	print(appReportsUrlsCsvFile)
-# 	return
 
 
 def getPolicyViolationsForOverrideApplications():
@@ -311,7 +278,7 @@ def writePolicyViolations(url):
 
 def getSecLicIssuesForOverrideApplications():
   with open(appIssuesStatusCsvFile, 'w') as fd:
-    fd.write('ApplicationId,ComponentHash,PackageUrl,CVE,SecurityScore,VulnStatus,LicenceStatus\n')
+    fd.write('ApplicationId,ComponentHash,PackageUrl,CVE,SecurityScore,SecurityStatus,LicenceStatus\n')
     fd.close()
 
   # read the app report urls file (it contains on applications with overrides)
