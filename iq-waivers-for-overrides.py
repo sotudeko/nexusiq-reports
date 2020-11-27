@@ -5,6 +5,7 @@ outputDir = './datafiles'
 
 overRidesCsvFile = '{}/{}'.format(outputDir, 'overrides.csv')
 appPolicyViolationsCsvFile = '{}/{}'.format(outputDir, 'apppolicyviolations.csv')
+summaryCsvFile = '{}/{}'.format(outputDir, 'summary.csv')
 
 overridesDb = fileIO.readCsvFile(overRidesCsvFile)
 violationsDb = fileIO.readCsvFile(appPolicyViolationsCsvFile)
@@ -28,6 +29,7 @@ def getViolation(applicationId, componentHash, cve):
 
 
 def main():
+  summaryDB = []
 
   for override in overridesDb:
     applicationId = override[1]
@@ -37,10 +39,11 @@ def main():
     cve = override[6]
 
     applicationPublicId, policyViolationId = getViolation(applicationId, componentHash, cve)
-    line = packageUrl + "," + cve + "," + overrideStatus + "," + applicationPublicId + "," + policyViolationId
-    print(line)
+    line = packageUrl + "," + cve + "," + overrideStatus + "," + applicationPublicId + "," + policyViolationId + "\n"
+    summaryDB.append(line)
 
-
+  csvHeader = "PackageUrl,CVE,OverrideStatus,ApplicationPublicId,PolicyViolationId\n"
+  fileIO.writeCSVFile(summaryCsvFile, csvHeader, summaryDB)
 
 if __name__ == '__main__':
   main()
