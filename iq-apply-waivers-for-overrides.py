@@ -5,7 +5,7 @@ outputDir = './datafiles'
 
 overRidesCsvFile = '{}/{}'.format(outputDir, 'overrides.csv')
 appPolicyViolationsCsvFile = '{}/{}'.format(outputDir, 'apppolicyviolations.csv')
-summaryCsvFile = '{}/{}'.format(outputDir, 'summary.csv')
+summaryCsvFile = '{}/{}'.format(outputDir, 'applywaivers.csv')
 
 overridesDb = fileIO.readCsvFile(overRidesCsvFile)
 violationsDb = fileIO.readCsvFile(appPolicyViolationsCsvFile)
