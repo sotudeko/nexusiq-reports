@@ -1,5 +1,5 @@
 
-from lib import fileIO
+from applib import fileIO
 
 outputDir = './datafiles'
 
@@ -7,7 +7,7 @@ overRidesCsvFile = '{}/{}'.format(outputDir, 'overrides.csv')
 appPolicyViolationsCsvFile = '{}/{}'.format(outputDir, 'apppolicyviolations.csv')
 summaryCsvFile = '{}/{}'.format(outputDir, 'applywaivers.csv')
 
-overridesDb = fileIO.readCsvFile(overRidesCsvFile)
+overridesDb = fileIO.readOverridesFile(overRidesCsvFile)
 violationsDb = fileIO.readCsvFile(appPolicyViolationsCsvFile)
 
 

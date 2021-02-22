@@ -2,7 +2,7 @@ import sys
 import os
 import os.path
 import csv
-from lib import nexusiq, fileIO, util
+from applib import nexusiq, fileIO, util
 
 iqHost = sys.argv[1]
 iqUser = sys.argv[2]
@@ -14,7 +14,6 @@ outputDir = './datafiles'
 workdir = '{}/{}'.format(outputDir, 'policyviolationfiles')
 overRidesCsvFile = '{}/{}'.format(outputDir, 'overrides.csv')
 overridesDB = fileIO.readOverridesFile(overRidesCsvFile)
-
 appsOverridenDb = []
 
 appReportsJsonFile = '{}/{}'.format(outputDir, 'appreports.json')

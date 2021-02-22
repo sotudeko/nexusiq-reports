@@ -1,7 +1,9 @@
 import sys
 import os
 import os.path
-from lib import nexusiq, fileIO, util
+from applib import nexusiq, fileIO, util
+
+# from lib import nexusiq, fileIO, util
 
 iqHost = sys.argv[1]
 iqUser = sys.argv[2]
