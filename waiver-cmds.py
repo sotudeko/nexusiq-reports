@@ -6,22 +6,25 @@ outputDir = fileIO.outputDir
 summaryCsvFile = '{}/{}'.format(outputDir, 'applywaivers.csv')
 cmdFile = '{}/{}'.format(outputDir, "cmdfile.txt")
 
-overridesDb = fileIO.readOverridesFile()
-violationsDb = fileIO.readSecurityViolationsFile()
+securityOverridesDb = fileIO.readSecurityOverridesFile()
+licenseOverridesDb = fileIO.readSecurityOverridesFile()
+
+violationsDb = fileIO.readOverridesViolationsFile()
 
 
-def getViolation(applicationId, componentHash, cve):
+def getViolation(violationTYpe, applicationId, componentHash, cve):
   applicationPublicId = "none"
   policyViolationId = "none"
 
   for violation in violationsDb:
-    _applicationId = violation[1]
-    _componentHash = violation[3]
-    _cve = violation[10]
+    _type = violation[0]
+    _applicationId = violation[2]
+    _componentHash = violation[4]
+    _cve = violation[11]
 
-    if _applicationId == applicationId and _componentHash == componentHash and _cve == cve:
-      applicationPublicId = violation[0]
-      policyViolationId = violation[8]
+    if _type == violationTYpe and _applicationId == applicationId and _componentHash == componentHash and _cve == cve:
+      applicationPublicId = violation[1]
+      policyViolationId = violation[9]
       break
 
   return applicationPublicId, policyViolationId
@@ -39,14 +42,14 @@ def main():
 
   with open(cmdFile, 'w') as fd:
 
-    for override in overridesDb:
+    for override in securityOverridesDb:
       applicationId = override[1]
       overrideStatus = override[2]
       packageUrl = override[4]
       componentHash = override[5]
       cve = override[6]
 
-      applicationPublicId, policyViolationId = getViolation(applicationId, componentHash, cve)
+      applicationPublicId, policyViolationId = getViolation("security", applicationId, componentHash, cve)
       line = packageUrl + "," + cve + "," + overrideStatus + "," + applicationPublicId + "," + policyViolationId + "\n"
       summaryDB.append(line)
       cmd = writeCommand(applicationPublicId, policyViolationId)

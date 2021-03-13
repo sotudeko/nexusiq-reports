@@ -45,18 +45,18 @@ def readSecurityOverridesFile():
 
     return overRidesDb
 
-# def readSecurityViolationsFile():
-#     violationsDb = []
-#     rownumber = 0
-#     with open(securityViolationsCsvFile) as csvfile:
-#         csvdata = csv.reader(csvfile, delimiter=',')
-#         for r in csvdata:
-#             if rownumber == 0:
-#                 rownumber += 1
-#             else:
-#                 rownumber += 1
+def readOverridesViolationsFile():
+    violationsDb = []
+    rownumber = 0
+    with open(overrideViolationsCsvFile) as csvfile:
+        csvdata = csv.reader(csvfile, delimiter=',')
+        for r in csvdata:
+            if rownumber == 0:
+                rownumber += 1
+            else:
+                rownumber += 1
 
-#                 line = r[0] + ',' + r[1] + ',' + r[2] + ',' + r[3] + ',' + r[4] + ',' + r[5] + ',' + r[6] + ',' + r[7] + ',' + r[8] + ',' + r[9] + ',' + r[10] + ',' + r[11]
-#                 violationsDb.append(r)
+                line = r[0] + ',' + r[1] + ',' + r[2] + ',' + r[3] + ',' + r[4] + ',' + r[5] + ',' + r[6] + ',' + r[7] + ',' + r[8] + ',' + r[9] + ',' + r[10] + ',' + r[11]
+                violationsDb.append(r)
 
-#     return violationsDb
+    return violationsDb
