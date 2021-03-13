@@ -1,6 +1,21 @@
 import json
 import csv
 
+outputDir = './datafiles'
+violationsWorkdir = '{}/{}'.format(outputDir, 'violations')
+licenceWorkdir = '{}/{}'.format(outputDir, 'licensedata')
+
+appReportsJsonFile = '{}/{}'.format(outputDir, 'app_reports.json')
+appReportsUrlsCsvFile = '{}/{}'.format(outputDir, 'app_reportsurls.csv')
+
+securityOverRidesJsonFile = '{}/{}'.format(outputDir, 'security_overrides.json')
+securityOverRidesCsvFile = '{}/{}'.format(outputDir, 'security_overrides.csv')
+
+licenseOverridesCsvFile = '{}/{}'.format(outputDir, 'license_overrides.csv')
+
+overrideViolationsCsvFile = '{}/{}'.format(outputDir, 'overrides_violations.csv')
+
+
 def writeCSVFile(csvFile, csvHeader, csvData):
     with open(csvFile, 'w') as fd:
         fd.write(csvHeader)
@@ -16,10 +31,10 @@ def writeJsonFile(jsonFile, jsonData):
     # print(jsonFile)
     return
 
-def readOverridesFile(overRidesCsvFile):
+def readSecurityOverridesFile():
     overRidesDb = []
     rownumber = 0
-    with open(overRidesCsvFile) as csvfile:
+    with open(securityOverRidesCsvFile) as csvfile:
         csvdata = csv.reader(csvfile, delimiter=',')
         for r in csvdata:
             if rownumber == 0:
@@ -30,18 +45,18 @@ def readOverridesFile(overRidesCsvFile):
 
     return overRidesDb
 
-def readCsvFile(appPolicyViolationsCsvFile):
-    violationsDb = []
-    rownumber = 0
-    with open(appPolicyViolationsCsvFile) as csvfile:
-        csvdata = csv.reader(csvfile, delimiter=',')
-        for r in csvdata:
-            if rownumber == 0:
-                rownumber += 1
-            else:
-                rownumber += 1
+# def readSecurityViolationsFile():
+#     violationsDb = []
+#     rownumber = 0
+#     with open(securityViolationsCsvFile) as csvfile:
+#         csvdata = csv.reader(csvfile, delimiter=',')
+#         for r in csvdata:
+#             if rownumber == 0:
+#                 rownumber += 1
+#             else:
+#                 rownumber += 1
 
-                line = r[0] + ',' + r[1] + ',' + r[2] + ',' + r[3] + ',' + r[4] + ',' + r[5] + ',' + r[6] + ',' + r[7] + ',' + r[8] + ',' + r[9] + ',' + r[10] + ',' + r[11]
-                violationsDb.append(r)
+#                 line = r[0] + ',' + r[1] + ',' + r[2] + ',' + r[3] + ',' + r[4] + ',' + r[5] + ',' + r[6] + ',' + r[7] + ',' + r[8] + ',' + r[9] + ',' + r[10] + ',' + r[11]
+#                 violationsDb.append(r)
 
-    return violationsDb
+#     return violationsDb

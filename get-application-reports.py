@@ -10,19 +10,15 @@ iqPwd = sys.argv[3]
 
 iq = nexusiq.NexusIQData(iqHost, iqUser, iqPwd)
 
-outputDir = './datafiles'
+appReportsJsonFile = fileIO.appReportsJsonFile
+appReportsUrlsCsvFile = fileIO.appReportsUrlsCsvFile
 reportsDb = []
-
-appReportsJsonFile = '{}/{}'.format(outputDir, 'app_reports.json')
-appReportsUrlsCsvFile = '{}/{}'.format(outputDir, 'app_reportsurls.csv')
 
 
 def getApplicationEvaluationReports():
-  # get all application reports info
   statusCode, applicationEvaluations = iq.getData('/api/v2/reports/applications')
 
   if statusCode == 200:
-    # Write the json data to file
     fileIO.writeJsonFile(appReportsJsonFile, applicationEvaluations)
     print(appReportsJsonFile)
     

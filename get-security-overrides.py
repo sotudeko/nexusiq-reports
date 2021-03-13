@@ -10,23 +10,19 @@ iqPwd = sys.argv[3]
 
 iq = nexusiq.NexusIQData(iqHost, iqUser, iqPwd)
 
-outputDir = './datafiles'
-workdir = '{}/{}'.format(outputDir, 'violations')
-
-overRidesCsvFile = '{}/{}'.format(outputDir, 'security_overrides.csv')
-overRidesDb = []
+securityOverRidesJsonFile = fileIO.securityOverRidesJsonFile
+securityOverRidesCsvFile = fileIO.securityOverRidesCsvFile
+securityOverridesDb = []
 
 def getSecurityOverRidesData():
-  # get security vulnerabilty override data
   statusCode, overrides = iq.getData('/api/v2/securityOverrides')
 
   if statusCode == 200:
-    # Write the json data to file
-    # fileIO.writeJsonFile(overRidesJsonFile, overrides)
+    fileIO.writeJsonFile(securityOverRidesJsonFile, overrides)
+    print (securityOverRidesJsonFile)
 
-    overrides = overrides['securityOverrides']
+    for override in overrides['securityOverrides']:
 
-    for override in overrides:
       comment = override["comment"]
       referenceId = override["referenceId"]
       status = override["status"]
@@ -37,17 +33,16 @@ def getSecurityOverRidesData():
         packageUrl = affectedComponent["packageUrl"]
         componentHash = affectedComponent["hash"]
 
-      # write only if it is format we need
-      if not util.overrideFormat(packageUrl):
+      if not util.isAname(packageUrl):
         continue
 
       line = ownerName + "," + ownerId + "," + status + "," + comment + "," + packageUrl + "," + componentHash + "," + referenceId + "\n"
-      overRidesDb.append(line)
+      securityOverridesDb.append(line)
 
     csvHeader = "ApplicationName,ApplicationId,OverrideStatus,Comment,PackageUrl,ComponentHash,CVE\n"
-    fileIO.writeCSVFile(overRidesCsvFile, csvHeader, overRidesDb)
+    fileIO.writeCSVFile(securityOverRidesCsvFile, csvHeader, securityOverridesDb)
 
-  print(overRidesCsvFile)
+  print(securityOverRidesCsvFile)
 
 
 def main():

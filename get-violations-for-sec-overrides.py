@@ -10,11 +10,10 @@ iqPwd = sys.argv[3]
 
 iq = nexusiq.NexusIQData(iqHost, iqUser, iqPwd)
 
-outputDir = './datafiles'
-workdir = '{}/{}'.format(outputDir, 'violations')
+outputDir = fileIO.outputDir
+workdir = fileIO.violationsWorkdir
 
-overRidesCsvFile = '{}/{}'.format(outputDir, 'security_overrides.csv')
-overridesDb = fileIO.readOverridesFile(overRidesCsvFile)
+overridesDb = fileIO.readOverridesFile()
 
 appReportsJsonFile = '{}/{}'.format(outputDir, 'app_reports.json')
 appReportsUrlsCsvFile = '{}/{}'.format(outputDir, 'app_reportsurls.csv')
@@ -138,7 +137,6 @@ def getPolicyViolations():
 
   print(appPolicyViolationsCsvFile)
   return
-
 
 
 def main():

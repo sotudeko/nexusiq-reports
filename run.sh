@@ -10,12 +10,17 @@ iqPwd=admin123
 
 datafiles_dir="./datafiles"
 violations_dir=${datafiles_dir}/violations
+license_dir=${datafiles_dir}/licensedata
 
 rm -rf ${datafiles_dir}
 
 mkdir ${datafiles_dir}
 mkdir ${violations_dir}
+mkdir ${license_dir}
+
 
 python3 get-security-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-application-reports.py ${iqUrl} ${iqUser} ${iqPwd}
-python3 get-violations-for-sec-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
+python3 get-license-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
+python3 get-security-license-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
+# python3 security-waiver-cmds.py
