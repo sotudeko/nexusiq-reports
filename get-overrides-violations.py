@@ -55,16 +55,16 @@ def applicationHasOverride(overridesDb, applicationId):
   return exists
 
 
-def componentHasSecurityOverride(applicationId, packageUrl):
-  exists = False
+# def componentHasSecurityOverride(applicationId, packageUrl):
+#   exists = False
 
-  for o in securityOverridesDb:
-    overrideApplicationId = o[1]
-    overridePackageUrl = o[4]
+#   for o in securityOverridesDb:
+#     overrideApplicationId = o[1]
+#     overridePackageUrl = o[4]
 
-    if overrideApplicationId == applicationId and overridePackageUrl == packageUrl:
-      exists = True
-      break
+#     if overrideApplicationId == applicationId and overridePackageUrl == packageUrl:
+#       exists = True
+#       break
 
   return exists
 
