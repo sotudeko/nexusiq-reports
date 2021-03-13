@@ -33,7 +33,7 @@ def writeCommand(applicationPublicId, policyViolationId):
   iqUrl = "http://localhost:8070"
   iqUser = "admin"
   iqPwd = "admin123"
-  cmd = "curl -u " + iqUser + ":" + iqPwd + " -X POST -H \"Content-Type: application/json\" -d " + "'{\"comment\": \"adding waiver for status override\"}' " + iqUrl + "/api/v2/policyWaivers/application/" + applicationPublicId + "/" + policyViolationId
+  cmd = "curl -u " + iqUser + ":" + iqPwd + " -X POST -H \"Content-Type: application/json\" -d " + "'{\"comment\": \"adding waiver for status override\"}' " + iqUrl + "/api/v2/policyWaivers/application/" + applicationPublicId + "/" + policyViolationId + "\n"
   return cmd
 
 def main():

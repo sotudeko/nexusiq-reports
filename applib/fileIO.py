@@ -6,14 +6,14 @@ def writeCSVFile(csvFile, csvHeader, csvData):
         fd.write(csvHeader)
         for line in csvData:
             fd.write(line)
-    print(csvFile)
+    # print(csvFile)
     return
 
 def writeJsonFile(jsonFile, jsonData):
     with open(jsonFile, 'w') as fd:
         json.dump(jsonData, fd, indent=4)
 
-    print(jsonFile)
+    # print(jsonFile)
     return
 
 def readOverridesFile(overRidesCsvFile):
