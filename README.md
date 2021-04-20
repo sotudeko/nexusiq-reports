@@ -1,6 +1,7 @@
 # nexusiq-reports
 
   * Primarily, these scripts attempt to provide information on the use of the status property on security vulnerabilities
+  * Typically, these scripts should be run on a Nexus IQ before it is enabled for MJA
   * Data is extracted from a number of Nexus IQ API's and saves to files for later analysis
   * All output files are written to a sub-directory named 'datafiles'
   * These scripts do not actually makes any changes to the Nexus IQ data
@@ -34,27 +35,11 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
     - read the app report urls file  and get the policy violations for each application
     - writes output to datafiles/overrides_violations.csv only for security/license overrides associated with MJA-related files only (ie. a-name)
     
-    
     waiver-cmds.py
+    - read the security overrides file ad write out example curl command to apply a waiver to replace the status override after MJA is enabled
+    - Writes output to datafiles/cmdfile.txt.
     
-  * Output files
-    * output from [security vulnerability overrides API](https://help.sonatype.com/iqserver/automating/rest-apis/security-vulnerability-override-api---v2)
-    ```
-    ./datafiles/overrides.json
-    ./datafiles/overrides.csv
-    ```
-    * output from [reports-related rest API](https://help.sonatype.com/iqserver/automating/rest-apis/report-related-rest-apis---v2)
-    ```
-    ./datafiles/appreports.json
-    ./datafiles/appreportsurls.csv
-    ./datafiles/apppolicyviolations.csv
-    ./datafiles/appissuesstatus.csv
-    ```
-    * summary report 
-    ```
-    ./datafiles/statussummary.csv
-    ```
-    
+  
     
     
     
