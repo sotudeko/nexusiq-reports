@@ -8,6 +8,7 @@
   * It is highly recommended to run these scripts on test instances of Nexus IQ and not on any production instance
   * NB. THESE SCRIPTS ARE EXPERIMENTAL ONLY
   
+  
   * Pre-requisites:
     * python3 
     * Nexus IQ url, username and password
@@ -37,7 +38,7 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
     
     waiver-cmds.py
     - read the security overrides file ad write out example curl command to apply a waiver to replace the status override after MJA is enabled
-    - Writes output to datafiles/cmdfile.txt.
+    - Writes waiver parameters to datafiles/applywaivers.csv. Also writes example curl commands to datafiles/cmdfile.txt.
     
   
     
