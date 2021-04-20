@@ -17,6 +17,11 @@
 ```
 The Unix shell script run.sh provides an example of the setup and run sequence of all the files.
 ```
+   
+&nbsp;
+&nbsp;
+&nbsp;
+
   * Description
   * 
     get-security-overrides.py
@@ -40,7 +45,7 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
     - read the security overrides file ad write out example curl command to apply a waiver to replace the status override after MJA is enabled
     - Writes waiver parameters to datafiles/applywaivers.csv. Also writes example curl commands to datafiles/cmdfile.txt.
     
-  &nbsp;
+&nbsp;
 &nbsp;
 &nbsp;
 
@@ -52,12 +57,7 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
 * Remember:
 
 * Use this contribution at the risk tolerance that you have
-* Do NOT file Sonatype support tickets related to iq-success-metrics
-* DO file issues here on GitHub, so that the community can pitch in
-* Phew, that was easier than I thought. Last but not least of all:
-
-* Have fun creating and using this application and the Nexus platform, we are glad to have you here!
-
+* Do NOT file Sonatype support tickets related to these scripts
     
     
     
