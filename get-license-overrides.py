@@ -49,7 +49,6 @@ def getLicenseOverrides():
               continue
             
             status = component["licenseData"]["status"]
-
             if not util.isLicenseOverrideStatus(status):
               continue
 
