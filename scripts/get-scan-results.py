@@ -110,7 +110,7 @@ def getScanResults(appdir):
     totalComponentCount = data["policyEvaluationResult"]["totalComponentCount"]
 
     with open(csvfile, 'w') as wfd:
-        wfd.write("Component Name,Next No Violations Version,Vulnerability Id,Threat Level,Policy Name\n")
+        wfd.write("Component Name,Remediation Version,Vulnerability Id,Threat Level,Policy Name\n")
 
         for r in result:
             policyName = r["trigger"]["policyName"]
