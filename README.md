@@ -8,7 +8,8 @@
   * It is highly recommended to run these scripts on test instances of Nexus IQ and not on any production instance
   * NB. THESE SCRIPTS ARE EXPERIMENTAL ONLY
   
-  
+ &nbsp;
+
   * Pre-requisites:
     * python3 
     * Nexus IQ url, username and password
@@ -17,6 +18,11 @@
 ```
 The Unix shell script run.sh provides an example of the setup and run sequence of all the files.
 ```
+   
+&nbsp;
+&nbsp;
+&nbsp;
+
   * Description
   * 
     get-security-overrides.py
@@ -40,7 +46,19 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
     - read the security overrides file ad write out example curl command to apply a waiver to replace the status override after MJA is enabled
     - Writes waiver parameters to datafiles/applywaivers.csv. Also writes example curl commands to datafiles/cmdfile.txt.
     
-  
+&nbsp;
+&nbsp;
+&nbsp;
+
+**The Fine Print**
+* It is worth noting that this is NOT SUPPORTED by Sonatype, and is a contribution to the open source community 
+
+* Don't worry, using this community item does not "void your warranty". In a worst case scenario, you may be asked by the Sonatype Support team to remove the community item in order to determine the root cause of any issues.
+
+* Remember:
+
+* Use this contribution at the risk tolerance that you have
+* Do NOT file Sonatype support tickets related to these scripts
     
     
     
