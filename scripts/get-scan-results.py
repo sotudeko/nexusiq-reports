@@ -1,53 +1,179 @@
-import sys
+import json
+import requests
 import os
 import os.path
+import sys
 import csv
-from applib import nexusiq, fileIO, util
+import shutil
 
-iqHost = sys.argv[1]
-iqUser = sys.argv[2]
-iqPwd = sys.argv[3]
 
-iq = nexusiq.NexusIQData(iqHost, iqUser, iqPwd)
+iqUrl = "http://localhost:8070"
+iqUser = "admin"
+iqPwd = "admin123"
 
-securityOverRidesJsonFile = fileIO.securityOverRidesJsonFile
-securityOverRidesCsvFile = fileIO.securityOverRidesCsvFile
-securityOverridesDb = []
 
-def getSecurityOverRidesData():
-  statusCode, overrides = iq.getData('/api/v2/securityOverrides')
+def getApplicationInternalId(applicationName):
+    applicationUrl = "{}/{}?publicId={}".format(iqUrl, "api/v2/applications", applicationName)
+    req = requests.get(applicationUrl, auth=(iqUser, iqPwd), verify=False)
 
-  if statusCode == 200:
-    fileIO.writeJsonFile(securityOverRidesJsonFile, overrides)
-    print (securityOverRidesJsonFile)
+    if req.status_code != 200:
+        return
 
-    for override in overrides['securityOverrides']:
+    data = req.json()
 
-      comment = override["comment"]
-      referenceId = override["referenceId"]
-      status = override["status"]
-      ownerName = override["owner"]["ownerName"]
-      ownerId = override["owner"]["ownerId"]
+    applicationData = data["applications"]
+    applicationInternalId = applicationData[0]["id"]
 
-      for affectedComponent in override["currentlyAffectedComponents"]:
-        packageUrl = affectedComponent["packageUrl"]
-        componentHash = affectedComponent["hash"]
+    return applicationInternalId
 
-      if not util.isAname(packageUrl):
-        continue
 
-      line = ownerName + "," + ownerId + "," + status + "," + comment + "," + packageUrl + "," + componentHash + "," + referenceId + "\n"
-      securityOverridesDb.append(line)
+def getComponentRemediation(applicationInternalId, purl, stageId):
+    # remediationUrl = "{}/{}/{}".format(iqUrl, "api/v2/components/remediation/application", applicationInternalId, stageId)
+    remediationUrl = "{}/{}/{}?stageId={}".format(iqUrl, "api/v2/components/remediation/application", applicationInternalId, stageId)
 
-    csvHeader = "ApplicationName,ApplicationId,OverrideStatus,Comment,PackageUrl,ComponentHash,CVE\n"
-    fileIO.writeCSVFile(securityOverRidesCsvFile, csvHeader, securityOverridesDb)
+    payload = {}
+    payload["packageUrl"] = purl
+    header = {"content-type": "application/json"}
+    req = requests.post(remediationUrl, auth=(iqUser, iqPwd), verify=False, data=json.dumps(payload), headers=header)
 
-  print(securityOverRidesCsvFile)
+    if req.status_code != 200:
+        return
+
+    data = req.json()
+
+    return data
+
+
+def getPurl(format, componentName):
+    purl = ""
+    prefix = "pkg:" + format + "/"
+
+    if format == "maven":
+        purl = prefix + componentName + "?type=jar"
+
+    if format == "npm":
+        purl = prefix + componentName
+
+    if format == "a-name":
+        purl = prefix + componentName
+
+    if format == "nuget":
+        purl = prefix + componentName
+
+    return purl
+
+
+def getCoordinate(componentIdentifier):
+    coordinate = ""
+    format = componentIdentifier["format"]
+    coordinates = componentIdentifier["coordinates"]
+    nextNoViolationsVersion = coordinates["version"]
+
+    if format == "maven":
+        coordinate = coordinates["groupId"] + "/" + coordinates["artifactId"] + "@" + coordinates["version"]
+
+    if format == "npm" or format == "nuget":
+        coordinate = coordinates["packageId"] + "@" + coordinates["version"]
+
+    if format == "a-name":
+        coordinate = coordinates["name"] + "@" + coordinates["version"]
+
+    return nextNoViolationsVersion
+
+
+def getScanResults(appdir):
+
+    resultfile = appdir + "/result.json"
+    csvfile = appdir + ".csv"
+
+    if not os.path.isfile(resultfile):
+        print ("file does not exist: " + resultfile)
+        return
+
+    rfd = open(resultfile)
+    data = json.load(rfd)
+    rfd.close()
+
+    applicationId = data["applicationId"]
+    applicationInternalId = getApplicationInternalId(applicationId)
+
+    reportDataUrl = data["reportDataUrl"]
+    result = data["policyEvaluationResult"]["alerts"]
+    affectedComponentCount = data["policyEvaluationResult"]["affectedComponentCount"]
+    criticalComponentCount= data["policyEvaluationResult"]["criticalComponentCount"]
+    severeComponentCount = data["policyEvaluationResult"]["severeComponentCount"]
+    moderateComponentCount = data["policyEvaluationResult"]["moderateComponentCount"]
+    criticalPolicyViolationCount = data["policyEvaluationResult"]["criticalPolicyViolationCount"]
+    severePolicyViolationCount = data["policyEvaluationResult"]["severePolicyViolationCount"]
+    moderatePolicyViolationCount = data["policyEvaluationResult"]["moderatePolicyViolationCount"]
+    grandfatheredPolicyViolationCount = data["policyEvaluationResult"]["grandfatheredPolicyViolationCount"]
+    totalComponentCount = data["policyEvaluationResult"]["totalComponentCount"]
+
+    with open(csvfile, 'w') as wfd:
+        wfd.write("Component Name,Next No Violations Version,Vulnerability Id,Threat Level,Policy Name\n")
+
+        for r in result:
+            policyName = r["trigger"]["policyName"]
+            threatLevel = r["trigger"]["threatLevel"]
+            componentName = ""
+            format = ""
+            cve = ""
+
+            if threatLevel > 6:
+
+                for componentFact in r["trigger"]["componentFacts"]:
+                    format = componentFact["componentIdentifier"]["format"]
+
+                    if format == "npm" or format == "nuget":
+                        componentName = componentFact["componentIdentifier"]["coordinates"]["packageId"] + "@" + \
+                                        componentFact["componentIdentifier"]["coordinates"]["version"]
+                    elif format == "a-name":
+                            componentName = componentFact["componentIdentifier"]["coordinates"]["name"] + "@" + \
+                                            componentFact["componentIdentifier"]["coordinates"]["version"]
+                    elif format == "maven":
+                        componentName = componentFact["componentIdentifier"]["coordinates"]["groupId"] + "/" + \
+                                        componentFact["componentIdentifier"]["coordinates"]["artifactId"] + "@" + \
+                                        componentFact["componentIdentifier"]["coordinates"]["version"]
+
+                    purl = getPurl(format, componentName)
+                    remediationData = getComponentRemediation(applicationInternalId, purl, "build")
+                    nextNoViolationsVersion = ""
+
+                    if remediationData:
+                        versionChanges = remediationData["remediation"]["versionChanges"]
+
+                        for vc in versionChanges:
+                            type = vc["type"]
+                            if type == "next-no-violations":
+                                nextNoViolationsVersion = getCoordinate(vc["data"]["component"]["componentIdentifier"])
+
+                    for constraintfact in componentFact["constraintFacts"]:
+                        for v in constraintfact["conditionFacts"]:
+                            reference = v["reference"]
+                            if reference:
+                                cve = v["reference"]["value"]
+                                cve = cve + ","
+                        cve = cve[:-1]
+
+                    if cve:
+                        line = componentName + "," + nextNoViolationsVersion + "," + cve + "," + str(threatLevel) + "," + policyName + "\n"
+                        wfd.write(line)
+    wfd.close()
+    print("csv file: " + csvfile)
+
+    return
 
 
 def main():
-   getSecurityOverRidesData()
+    appdirs = []
+    appdirs.append("tut-spring-boot-kotlin")
+    appdirs.append("shopizer")
+    appdirs.append("angularElementsDemo")
 
+    for ad in appdirs:
+        getScanResults(ad)
 
 if __name__ == '__main__':
-  main()
+    main()
+
+
