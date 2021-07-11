@@ -65,7 +65,7 @@ def getLicenseDetails(reason):
 
 def applicationHasOverride(overridesDb, applicationId):
   exists = False
-
+  
   for o in overridesDb:
     overrideApplicationId = o[1]
 
@@ -76,23 +76,10 @@ def applicationHasOverride(overridesDb, applicationId):
   return exists
 
 
-# def componentHasSecurityOverride(applicationId, packageUrl):
-#   exists = False
-
-#   for o in securityOverridesDb:
-#     overrideApplicationId = o[1]
-#     overridePackageUrl = o[4]
-
-#     if overrideApplicationId == applicationId and overridePackageUrl == packageUrl:
-#       exists = True
-#       break
-
-  return exists
-
-def componentHasOverride(overrideDb, applicationId, packageUrl):
+def componentHasSecurityOverride(applicationId, packageUrl):
   exists = False
 
-  for o in overrideDb:
+  for o in securityOverridesDb:
     overrideApplicationId = o[1]
     overridePackageUrl = o[4]
 
@@ -102,14 +89,38 @@ def componentHasOverride(overrideDb, applicationId, packageUrl):
 
   return exists
 
+def componentHasLicenseOverride(applicationId, packageUrl):
+  exists = False
+
+  for o in licenseOverridesDb:
+    overrideApplicationId = o[1]
+    overridePackageUrl = o[2]
+
+    if overrideApplicationId == applicationId and overridePackageUrl == packageUrl:
+      exists = True
+      break
+
+  return exists
+
+# def componentHasOverride(overrideDb, applicationId, packageUrl):
+#   exists = False
+
+#   for o in overrideDb:
+#     overrideApplicationId = o[1]
+#     overridePackageUrl = o[4]
+
+#     if overrideApplicationId == applicationId and overridePackageUrl == packageUrl:
+#       exists = True
+#       break
+
+#   return exists
+
 
 def getPolicyViolations():
 
   with open(overrideViolationsCsvFile, 'w') as fd:
     fd.write('PolicyCategory,ApplicationPublicId,ApplicationId,PackageUrl,ComponentHash,PolicyName,PolicyId,PolicyThreatLevel,PolicyViolationId,Waived,CVE,Severity\n')
     fd.close()
-
-  
 
   with open(appReportsUrlsCsvFile) as csvfile:
     r = csv.reader(csvfile, delimiter=',')
@@ -164,7 +175,7 @@ def getPolicyViolations():
                 severity = ""
 
                 if policyThreatCategory == "SECURITY":
-                  if not componentHasOverride(securityOverridesDb, applicationId, packageUrl):
+                  if not componentHasSecurityOverride(applicationId, packageUrl):
                     continue
 
                   constraints = violation['constraints']
@@ -179,7 +190,7 @@ def getPolicyViolations():
                       # severity = severity[:-1]
 
                 if policyThreatCategory == "LICENSE":
-                  if not componentHasOverride(licenseOverridesDb, applicationId, packageUrl):
+                  if not componentHasLicenseOverride(applicationId, packageUrl):
                     continue
 
                   constraints = violation['constraints']

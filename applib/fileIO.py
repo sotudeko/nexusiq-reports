@@ -31,10 +31,34 @@ def writeJsonFile(jsonFile, jsonData):
     # print(jsonFile)
     return
 
+def readAppsReportsUrlsFile():
+    reports = []
+
+    with open(appReportsUrlsCsvFile) as csvfile:
+        csvdata = csv.reader(csvfile, delimiter=',')
+        for r in csvdata:
+            reports.append(r)
+
+    return reports
+
 def readSecurityOverridesFile():
     overRidesDb = []
     rownumber = 0
     with open(securityOverRidesCsvFile) as csvfile:
+        csvdata = csv.reader(csvfile, delimiter=',')
+        for r in csvdata:
+            if rownumber == 0:
+                rownumber += 1
+            else:
+                rownumber += 1
+                overRidesDb.append(r)
+
+    return overRidesDb
+
+def readLicenseOverridesFile():
+    overRidesDb = []
+    rownumber = 0
+    with open(licenseOverridesCsvFile) as csvfile:
         csvdata = csv.reader(csvfile, delimiter=',')
         for r in csvdata:
             if rownumber == 0:
