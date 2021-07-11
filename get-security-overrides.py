@@ -1,3 +1,8 @@
+# get all the security over rides
+# writes all data to json file - security_overrides.json
+# writes only a-name data to csv file - security_overrides.csv
+# writes ApplicationName,ApplicationId,OverrideStatus,Comment,PackageUrl,ComponentHash,CVE
+
 import sys
 import os
 import os.path

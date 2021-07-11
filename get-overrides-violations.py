@@ -1,3 +1,12 @@
+# loads the security_override.csv and license_override.csv files
+# read the app report urls file app_reportsurls.csv 
+# checks if application has secruty or license override and if so gets the policy violation information
+# writes the policy info to json file for each application
+# for each of the components, if it is a-name and policy threat 7+ and has security or license override, writes it to file - overrides_violations.csv
+# data written
+#policyThreatCategory.lower() + "," + applicationName + "," + applicationId + "," + packageUrl + "," + componentHash + "," + policyName + "," + \
+                       #policyId + "," + policyThreatCategory + "," + str(policyThreatLevel) + "," + policyViolationId + "," + \
+                       #str(waived) + "," + cve + "," + severity + "\n"
 import sys
 import os
 import os.path
@@ -22,8 +31,20 @@ overrideViolationsCsvFile = fileIO.overrideViolationsCsvFile
 
 
 def getVulnerabilityDetails(reason):
+  cve = "no-cve"
+  severity = "no-severity"
+
   info = reason.split(' ')
-  return info[3], info[10]
+
+  if len(info) == 11:
+    cve = info[3]
+    severity = info[10]
+
+  # remove close bracket at the end of severity
+  severity = severity[:-1]
+
+  return cve, severity
+
 
 def getLicenseDetails(reason):
   info = reason.split(' ')
@@ -85,11 +106,10 @@ def componentHasOverride(overrideDb, applicationId, packageUrl):
 def getPolicyViolations():
 
   with open(overrideViolationsCsvFile, 'w') as fd:
-    fd.write('PolicyCategory,ApplicationPublicId,ApplicationId,PackageUrl,ComponentHash,PolicyName,PolicyId,PolicyThreatCategory,PolicyThreatLevel,PolicyViolationId,Waived,CVE,Severity\n')
+    fd.write('PolicyCategory,ApplicationPublicId,ApplicationId,PackageUrl,ComponentHash,PolicyName,PolicyId,PolicyThreatLevel,PolicyViolationId,Waived,CVE,Severity\n')
     fd.close()
 
-  # read the app report urls file  and get the policy violations for each application
-  # we will write out only those associated with a security or license override for MJA-related files only (ie. a-name)
+  
 
   with open(appReportsUrlsCsvFile) as csvfile:
     r = csv.reader(csvfile, delimiter=',')
@@ -156,7 +176,7 @@ def getPolicyViolations():
                       cve, severity = getVulnerabilityDetails(reason)
 
                       # remove close bracket at the end
-                      severity = severity[:-1]
+                      # severity = severity[:-1]
 
                 if policyThreatCategory == "LICENSE":
                   if not componentHasOverride(licenseOverridesDb, applicationId, packageUrl):
@@ -170,8 +190,9 @@ def getPolicyViolations():
                       reason = condition['conditionReason']
                       cve, severity = getLicenseDetails(reason)
 
-                line = policyThreatCategory.lower() + "," + applicationName + "," + applicationId + "," + packageUrl + "," + componentHash + "," + policyName + "," + \
-                       policyId + "," + policyThreatCategory + "," + str(policyThreatLevel) + "," + policyViolationId + "," + \
+                if not policyThreatCategory == "QUALITY":
+                  line = policyThreatCategory.lower() + "," + applicationName + "," + applicationId + "," + packageUrl + "," + componentHash + "," + policyName + "," + \
+                       policyId + "," + str(policyThreatLevel) + "," + policyViolationId + "," + \
                        str(waived) + "," + cve + "," + severity + "\n"
 
                 fd.write(line)

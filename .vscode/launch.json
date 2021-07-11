@@ -11,7 +11,7 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
-      "args": ["http://localhost:8070 admin admin123"]
+      "args": ["http://localhost:8070", "admin", "admin123"]
     }
   ]
 }

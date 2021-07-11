@@ -1,3 +1,9 @@
+# read list of application evaluation reports from app_reportsurls.csv
+# for each report, get the data and read the list of components in the report and get the license info
+# writes data if status = overridden - license_overrides.csv
+# writes the app report component information to json file for the each application
+# writes applicationName,applicationId,packageUrl,status,licenseStr
+
 import sys
 import os
 import os.path

@@ -18,8 +18,8 @@ mkdir ${datafiles_dir}
 mkdir ${violations_dir}
 mkdir ${license_dir}
 
-python3 get-security-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-application-reports.py ${iqUrl} ${iqUser} ${iqPwd}
+python3 get-security-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-license-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-overrides-violations.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 waiver-cmds.py

@@ -1,3 +1,8 @@
+# get all latest application evaluation reports
+# writes all data to json file - app_reports.json
+# write all data to csv file (list of appliocation names) - app_reportsurls.csv
+# writes applicationName,applicationId, applicationReportUrl,stage
+
 import sys
 import os
 import os.path
