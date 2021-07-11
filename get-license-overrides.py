@@ -26,7 +26,7 @@ licenseOverridesCsvFile = fileIO.licenseOverridesCsvFile
 def getLicenseOverrides():
 
   with open(licenseOverridesCsvFile, 'w') as fd:
-    fd.write('ApplicationPublicId,ApplicationId,PackageUrl,Status,OverriddenLicense\n')
+    fd.write('ApplicationPublicId,ApplicationId,PackageUrl,Status,OverrideLicenseId,OverrideLicenseName\n')
     fd.close()
 
   with open(appReportsUrlsCsvFile) as csvfile:
@@ -67,7 +67,7 @@ def getLicenseOverrides():
               licenseStr = overriddenLicenseId + ":" + overriddenLicenseName + ";"
 
             licenseStr = licenseStr[:-1]
-            line = applicationName + "," + applicationId + "," + packageUrl + "," + status + "," + licenseStr + "\n"
+            line = applicationName + "," + applicationId + "," + packageUrl + "," + status + "," + overriddenLicenseId + "," + overriddenLicenseName + "\n"
             fd.write(line)
       
             lic_json = workdir + "/" + applicationName + ".json"

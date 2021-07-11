@@ -24,11 +24,10 @@ workdir = fileIO.violationsWorkdir
 
 appReportsUrlsDb = fileIO.readAppsReportsUrlsFile()
 securityOverridesDb = fileIO.readSecurityOverridesFile()
-licenseOverridesDb = fileIO.readLicenseOverridesFile()
+# licenseOverridesDb = fileIO.readLicenseOverridesFile()
 
 appReportsUrlsCsvFile = fileIO.appReportsUrlsCsvFile
 overrideViolationsCsvFile = fileIO.overrideViolationsCsvFile
-
 
 def getAppReportUrl(reportApplicationId):
   reportUrl = ""
@@ -93,7 +92,7 @@ def getLicenseDetails(reason):
   return info[4], info[8]
 
 
-def getViolationInfoForOverride(url, findPackageUrl, findCve):
+def getViolationInfoForOverride(url, findPackageUrl, findCve, overrideStatus, comment):
 
   policyReportDataUrl = url.replace('/raw', '/policy')
   statusCode, policyReportData = iq.getData('/' + policyReportDataUrl)
@@ -120,9 +119,6 @@ def getViolationInfoForOverride(url, findPackageUrl, findCve):
         if not util.isAname(packageUrl):
           continue
 
-        # if not componentHasSecurityOverride(applicationId, packageUrl):
-        #   continue
-
         policyName = ""
         waived = ""
         reason = ""
@@ -146,7 +142,7 @@ def getViolationInfoForOverride(url, findPackageUrl, findCve):
             cve = ""
             severity = ""
 
-            if policyThreatCategory == "SECURITY":
+            if  policyThreatCategory == "SECURITY": 
               constraints = violation['constraints']
               for constraint in constraints:
                 conditions = constraint['conditions']
@@ -157,35 +153,25 @@ def getViolationInfoForOverride(url, findPackageUrl, findCve):
 
                   # remove close bracket at the end
                   # severity = severity[:-1]
-                  print (findCve + ":" + cve)
+
                   if not findCve == cve:
                     continue
-
-            # if policyThreatCategory == "LICENSE":
-            #   constraints = violation['constraints']
-            #   for constraint in constraints:
-            #     conditions = constraint['conditions']
-
-            #     for condition in conditions:
-            #       reason = condition['conditionReason']
-            #       cve, severity = getLicenseDetails(reason)
 
                   with open(overrideViolationsCsvFile, 'a') as fd:
 
                     line = policyThreatCategory.lower() + "," + applicationName + "," + applicationId + "," + packageUrl + "," + componentHash + "," + policyName + "," + \
                           policyId + "," + str(policyThreatLevel) + "," + policyViolationId + "," + \
-                          str(waived) + "," + cve + "," + severity + "\n"
+                          str(waived) + "," + cve + "," + severity + "," + overrideStatus + "," + comment + "\n"
 
                     fd.write(line)
 
-  print(overrideViolationsCsvFile)
   return
 
 
 def main():
 
   with open(overrideViolationsCsvFile, 'w') as fd:
-    fd.write('PolicyCategory,ApplicationPublicId,ApplicationId,PackageUrl,ComponentHash,PolicyName,PolicyId,PolicyThreatLevel,PolicyViolationId,Waived,CVE,Severity\n')
+    fd.write('PolicyCategory,ApplicationPublicId,ApplicationId,PackageUrl,ComponentHash,PolicyName,PolicyId,PolicyThreatLevel,PolicyViolationId,Waived,CVE,Severity,OverrideStatus,Comment\n')
     fd.close()
 
   for o in securityOverridesDb:
@@ -197,16 +183,19 @@ def main():
     componentHash = o[5]
     cve = o[6]
     url = getAppReportUrl(applicationId)
-    getViolationInfoForOverride(url, packageUrl, cve)
+    getViolationInfoForOverride(url, packageUrl, cve, overrideStatus, comment)
 
 
-  for o in licenseOverridesDb:
-    # ApplicationPublicId,ApplicationId,PackageUrl,Status,OverriddenLicense
-    applicationName = o[0]
-    applicationId = o[1]
-    url = getAppReportUrl(applicationId)
-    print(applicationName+ "," + url)
+  # for o in licenseOverridesDb:
+  #   applicationName = o[0]
+  #   applicationId = o[1]
+  #   packageUrl = o[2]
+  #   status = o[3]
+  #   overriddenLicense = o[4]
+  #   url = getAppReportUrl(applicationId)
+  #   getViolationInfoForOverride("LICENSE", url, packageUrl, "", status, overriddenLicense)
 
+  print(overrideViolationsCsvFile)
 
 
 if __name__ == '__main__':
