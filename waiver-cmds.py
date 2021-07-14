@@ -1,3 +1,5 @@
+# use this script generate apply waivers command
+# you may want edit  this to output fields you need andaslo add conditionals on the status
 
 from applib import fileIO
 import csv
@@ -13,6 +15,7 @@ def makeCommand(applicationPublicId, policyViolationId, comment):
   if not comment == "":
     _comment = comment
 
+  # add your iq url, user and password
   iqUrl = "http://iqurl"
   iqUser = "iquser"
   iqPwd = "iqpwd"

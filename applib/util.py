@@ -6,8 +6,8 @@ def getApplicationName(urlPath):
 
 
 def isAname(purl):
-    if ":a-name/" in purl or ":npm/" in purl:
-    # if ":a-name/" in purl:
+    #if ":a-name/" in purl or ":npm/" in purl:
+    if ":a-name/" in purl:
         return True
     else:
         return False

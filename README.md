@@ -38,8 +38,8 @@ The Unix shell script run.sh provides an example of the setup and run sequence o
     - writes output datafiles/license_ovveriddes.csv (also outputs json file for each application in datafiles/licensedata/<appname>.json
     - this script is potentially resource-intensive so it is definitely not recommended running this on a production instance
     
-    get-overrides-violations.py
-    - read the app report urls file  and get the policy violations for each application
+    get-security-overrides-policyinfo.py
+    - gets the policy violations for each overriden CVE 
     - writes output to datafiles/overrides_violations.csv only for security/license overrides associated with MJA-related files only (ie. a-name)
     
     waiver-cmds.py

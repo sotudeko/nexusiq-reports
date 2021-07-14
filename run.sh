@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# handy run time script to execute these scripts in the right order
+
 iqUrl=$1
 iqUser=$2
 iqPwd=$3
@@ -20,7 +22,6 @@ mkdir ${license_dir}
 
 python3 get-application-reports.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-security-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
+python3 get-license-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 get-security-overrides-policyinfo.py ${iqUrl} ${iqUser} ${iqPwd}
-
-# python3 get-license-overrides.py ${iqUrl} ${iqUser} ${iqPwd}
 python3 waiver-cmds.py
