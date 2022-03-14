@@ -3,8 +3,12 @@
 # usage: python3 policy-violations-list.py [iq-url] [iq-user] [iq-passwd] [listmode]
 # listmode =
 #   violations
-#   by-component
-#   by-application
+#   list-by-components
+#   list-by-applications
+#
+# Note: this script assumes use of the out-of-the-box Nexus IQ policy names and only fetches violations
+# for the 'red' policies. if you have changed policy names in any way, you will need to amend the list
+# of policies to report on in the 'securityPolicyList' and 'licensePolicyList' arrays below
 
 import requests
 import json
@@ -14,6 +18,7 @@ import sys
 iqurl = sys.argv[1]
 iquser = sys.argv[2]
 iqpwd = sys.argv[3]
+listmode = sys.argv[4]
 
 securityPolicyList = []
 securityPolicyList.append("Security-Critical")
@@ -33,6 +38,8 @@ iqapi = 'api/v2'
 
 def getNexusIqData(end_point):
     url = "{}/{}/{}" . format(iqurl, iqapi, end_point)
+
+    print("fetching data from " + url)
 
     req = requests.get(url, auth=(iquser, iqpwd), verify=False)
 
@@ -106,9 +113,10 @@ def getLicense(reasons):
 
 
 def writePolicyViolationsToCsv(policyViolations):
+    csvFilename = "policyViolations.csv"
     applicationViolations = policyViolations['applicationViolations']
 
-    with open("policyViolations.csv", 'w') as fd:
+    with open(csvFilename, 'w') as fd:
             writer = csv.writer(fd)
 
             line = []
@@ -159,26 +167,94 @@ def writePolicyViolationsToCsv(policyViolations):
 
     fd.close()
 
+    print(csvFilename)
+
     return
+
+
+def writeListToCsv(policyViolations, listmode):
+    csvFilename = listmode + ".csv"
+
+    applicationViolations = policyViolations['applicationViolations']
+
+    with open(csvFilename, 'w') as fd:
+        writer = csv.writer(fd)
+
+        line = []
+
+        if listmode == "list-by-components":
+            line.append("Component")
+            line.append("ApplicationName")
+        else:
+            line.append("ApplicationName")
+            line.append("Component")
+
+        writer.writerow(line)
+
+        for applicationViolation in applicationViolations:
+            applicationPublicId = applicationViolation["application"]["publicId"]
+
+            policyViolations = applicationViolation["policyViolations"]
+            for policyViolation in policyViolations:
+                stage = policyViolation["stageId"]
+                openTime = policyViolation["openTime"]
+                policyName = policyViolation["policyName"]
+                packageUrl = policyViolation["component"]["packageUrl"]
+
+                constraintViolations = policyViolation["constraintViolations"]
+
+                for constraintViolation in constraintViolations:
+                    reason = ""
+
+                    reasons = constraintViolation["reasons"]
+
+                    if policyName == "Integrity-Rating":
+                        reason = "Integrity-Rating"
+                    elif policyName in securityPolicyList:
+                        reason = getCVE(reasons)
+                    elif policyName in licensePolicyList:
+                        reason = getLicense(reasons)
+                    else:
+                        reason = ""
+
+                    line = []
+
+                    if listmode == "list-by-components":
+                        line.append(packageUrl)
+                        line.append(applicationPublicId)
+                    else:
+                        line.append(applicationPublicId)
+                        line.append(packageUrl)
+
+                    writer.writerow(line)
+
+    fd.close()
+
+    print(csvFilename)
+
+    return
+
 
 def main():
 
     policies = getNexusIqData('policies')
 
-    with open("policies.json", 'w') as fd:
-        json.dump(policies, fd, indent=2)
+    # with open("policies.json", 'w') as fd:
+    #     json.dump(policies, fd, indent=2)
 
     policyIds = getPolicyIds(policies)
 
     policyViolations = getNexusIqData("policyViolations?" + policyIds)
 
-    with open("policyViolations.json", 'w') as fd:
-        json.dump(policyViolations, fd, indent=2)
+    # with open("policyViolations.json", 'w') as fd:
+    #     json.dump(policyViolations, fd, indent=2)
 
-    writePolicyViolationsToCsv(policyViolations)
-
-
-
+    if listmode == "violations":
+        writePolicyViolationsToCsv(policyViolations)
+    elif listmode == "list-by-components":
+        writeListToCsv(policyViolations, "list-by-components")
+    elif listmode == "list-by-applications":
+        writeListToCsv(policyViolations, "list-by-applications")
 
 
 
