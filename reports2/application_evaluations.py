@@ -11,7 +11,7 @@ def makeApplicationEvaluationsReport():
     applicationEvaluations = r2.getNexusIqData('reports/applications')
 
     with open(jsonfile, 'w') as fd:
-            json.dump(applicationEvaluations, fd)
+            json.dumps(applicationEvaluations, fd)
 
     with open(csvfile, 'w') as fd:
             writer = csv.writer(fd)

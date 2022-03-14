@@ -13,7 +13,7 @@ def main():
 
     component_waivers.makeComponentWaiversReport()
 
-    firewall_quarantined.makeFirewallQuarantinedReport()
+    #firewall_quarantined.makeFirewallQuarantinedReport()
 
 
 

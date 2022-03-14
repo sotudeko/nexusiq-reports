@@ -130,3 +130,7 @@ dmypy.json
 
 datafiles
 datafiles2
+
+*.csv
+*.json
+
