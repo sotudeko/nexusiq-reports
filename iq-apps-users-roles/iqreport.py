@@ -11,6 +11,9 @@ iquser = sys.argv[2]
 iqpwd = sys.argv[3]
 
 iqapi = 'api/v2'
+rolesDb = {}
+
+
 
 def getNexusIqData(end_point):
     url = "{}/{}/{}" . format(iqurl, iqapi, end_point)
@@ -25,21 +28,27 @@ def getNexusIqData(end_point):
     return res
 
 
+def setRolesDb():
+    roles =  getNexusIqData('roles')
 
-def getApplicationName(urlPath):
-    l = urlPath.split('/')
-    return(l[3])
+    for role in roles["roles"]:
+        id = role["id"]
+        name = role["name"]
+        rolesDb[id] = name
+
+    return
 
 
-def getRolesAndUsers(obj, data):
+def getReport(obj, data):
     opfile = obj + ".csv"
 
     with open(opfile, 'w') as fd:
             writer = csv.writer(fd)
 
             line = []
-            line.append("ApplicationName")
-            line.append("EvaluationDate")
+            line.append("Name")
+            line.append("Role")
+            line.append("Members")
 
             writer.writerow(line)
 
@@ -53,13 +62,36 @@ def getRolesAndUsers(obj, data):
 
                 line = []
                 line.append(name)
-                line.append(id)
 
+                endpoint = "{}/{}/{}" . format("roleMemberships", obj, id)
+
+                rolesdata = getNexusIqData(endpoint)
+                role, ug = getRolesAndUsers(rolesdata["memberMappings"])
+
+                line.append(role)
+                line.append(ug)
+                
                 writer.writerow(line)
+
 
     print(opfile)
 
     return
+
+
+def getRolesAndUsers(data):
+    ug = ""
+
+    for d in data:
+        role = rolesDb.get(d["roleId"]) 
+
+        for m in d["members"]:
+            userOrGroupName = m["userOrGroupName"]
+            ug += userOrGroupName + ","
+
+        # ug = ug[:-1]
+
+    return role, ug
 
 
 def print_jsonfile(jsonfile, json_data):
@@ -72,15 +104,19 @@ def print_jsonfile(jsonfile, json_data):
     print(output_file)
     return
 
+
+
 def main():
+
+    setRolesDb()
 
     organizations = getNexusIqData('organizations')
     print_jsonfile("organizations", organizations)
-    getRolesAndUsers("orgs", organizations["organizations"])
+    getReport("organization", organizations["organizations"])
 
     applications = getNexusIqData('applications')
     print_jsonfile("applications", applications)
-    getRolesAndUsers("apps", applications["applications"])
+    getReport("application", applications["applications"])
 
 
 if __name__ == '__main__':
