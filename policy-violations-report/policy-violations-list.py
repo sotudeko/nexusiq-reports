@@ -36,6 +36,7 @@ licensePolicyList.append("License-Copyleft")
 iqapi = 'api/v2'
 
 
+
 def getNexusIqData(end_point):
     url = "{}/{}/{}" . format(iqurl, iqapi, end_point)
 
