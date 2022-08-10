@@ -16,6 +16,9 @@ import sys
 import csv
 import requests
 import json
+# from datetime import datetime
+import datetime
+
 
 iqurl = sys.argv[1]
 iquser = sys.argv[2]
@@ -247,11 +250,16 @@ def get_waiver_cmd(application_public_id, policy_violation_id):
 def get_waiver_payload():
   # https://help.sonatype.com/iqserver/automating/rest-apis/policy-waiver-rest-api---v2
 
+  waiver_duration = 30 # days
+
+  expiry_date = datetime.datetime.today() + datetime.timedelta(days=waiver_duration)
+  expiry_date_fmt = expiry_date.strftime("%Y-%m-%dT%H:%M:%S.00.000+0000")
+
   payload = {}
 
-  payload["matcherStrategy"] = "ALL_COMPONENTS"
+  payload["matcherStrategy"] = "ALL_COMPONENTS" # EXACT_COMPONENT, ALL_COMPONENTS, ALL_VERSIONS.
   payload["comment"] = "Automatic waiver"
-  payload["expiryTime"] = "2022-10-26T13:00:00.000+0000"
+  payload["expiryTime"] = expiry_date_fmt
 
   json_object = json.dumps(payload)
 
