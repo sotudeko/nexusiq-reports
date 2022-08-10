@@ -1,3 +1,16 @@
+# input
+
+# application_name
+# stage
+# policy_name
+# package_url
+# cve
+# scope = ROOT_ORGANIZATION_ID|organization|application
+
+# output
+
+# command to apply waiver
+
 
 import sys
 import csv
@@ -8,11 +21,19 @@ iqurl = sys.argv[1]
 iquser = sys.argv[2]
 iqpwd = sys.argv[3]
 
+# application_name = sys.argv[4]
+# stage = sys.argv[5]
+# policy_name = sys.argv[6]
+# package_url = sys.argv[7]
+# cve = sys.argv[8]
+# scope = sys.argv[9]
+
 application_name = 'webgoat'
 stage = 'build'
-policy_name = 'Security-High'
-package_url = 'pkg:maven/com.h2database/h2@1.4.187?type=jar'
-cve = 'CVE-2022-23221'
+policy_name = 'Security-Critical'
+package_url = 'pkg:maven/hsqldb/hsqldb@1.8.0.7?type=jar'
+cve = 'CVE-2007-4575'
+scope = 'application'
 
 csvfile = "list-of-violations.csv"
 
@@ -51,12 +72,13 @@ def getApplicationId(find_application_name):
     application_public_id = application["publicId"]
     application_name = application["name"]
     application_id = application["id"]
+    organization_id = application["organizationId"]
 
     if find_application_name == application_public_id:
       found_id = application_id
       break
 
-  return found_id
+  return found_id, organization_id
 
 
 def getApplicationEvaluationReportUrl(find_application_id, find_stage):
@@ -108,9 +130,8 @@ def getPolicyViolations(report_url, find_policy_name, find_package_url, find_cve
 
   if statusCode == 200:
     applicationId = policyReportData["application"]["id"]
-    applicationName = policyReportData["application"]["publicId"]
+    applicationPublicId = policyReportData["application"]["publicId"]
     components = policyReportData["components"]
-
 
     with open(csvfile, 'w') as fd:
       writer = csv.writer(fd)
@@ -128,7 +149,6 @@ def getPolicyViolations(report_url, find_policy_name, find_package_url, find_cve
       line.append("Policy Violation Id")
       line.append("Application Id")
 
-      print(line)
       writer.writerow(line)
 
       for component in components:
@@ -182,7 +202,7 @@ def getPolicyViolations(report_url, find_policy_name, find_package_url, find_cve
                     line.append(policyName)
                     # line.append(policyThreatCategory.lower())
                     line.append(str(policyThreatLevel))
-                    line.append(applicationName)
+                    line.append(applicationPublicId)
                     line.append(packageUrl)
                     line.append(cve)
                     line.append(str(waived))
@@ -192,21 +212,61 @@ def getPolicyViolations(report_url, find_policy_name, find_package_url, find_cve
                     line.append(policyViolationId)
                     line.append(applicationId)
 
-                    print(line)
                     writer.writerow(line)
+
+                    get_waiver_cmd(applicationPublicId, policyViolationId)
+
 
   return
 
 
+def get_waiver_cmd(application_public_id, policy_violation_id):
+  root_organization = 'ROOT_ORGANIZATION_ID'
+  waiver_api = '/api/v2/policyWaivers'
+
+  # if (scope == 'root'):
+  #   scope = 'organization/' + root_organization
+  # elif (scope == 'organization'):
+  #   scope = 'organization/' + application_public_id
+  # elif (scope == 'application'):
+  #   scope = 'application/' + application_public_id
+  # else:
+  #   return
+
+  payload = get_waiver_payload()
+
+  cmd = "curl -X POST -u " + iquser + ":" + iqpwd;
+  cmd+= " -H \"Content-Type: application/json\" -d '" + payload + "'"
+  cmd+= " " + iqurl + waiver_api + "/" + scope + "/" + application_public_id + "/" + policy_violation_id
+
+  print (cmd)
+
+  return
+
+
+def get_waiver_payload():
+  # https://help.sonatype.com/iqserver/automating/rest-apis/policy-waiver-rest-api---v2
+
+  payload = {}
+
+  payload["matcherStrategy"] = "ALL_COMPONENTS"
+  payload["comment"] = "Automatic waiver"
+  payload["expiryTime"] = "2022-10-26T13:00:00.000+0000"
+
+  json_object = json.dumps(payload)
+
+  return json_object
+
+
 def main():
 
-
-
-  application_id = getApplicationId(application_name)
+  application_id, organization_id = getApplicationId(application_name)
 
   report_url = getApplicationEvaluationReportUrl(application_id, stage)
 
   getPolicyViolations(report_url, policy_name, package_url, cve)
+
+  return
 
 
 if __name__ == '__main__':
