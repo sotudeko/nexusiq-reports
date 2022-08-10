@@ -6,11 +6,19 @@
 # package_url
 # cve
 # scope = ROOT_ORGANIZATION_ID|organization|application
+# application_name
+# stage
+# policy_name
+# package_url
+# cve
+# scope
+
+# Example
+# python3 get-iqreport-violations.py http://localhost:8070 admin admin123 webgoat build Security-Critical 'pkg:maven/hsqldb/hsqldb@1.8.0.7?type=jar' CVE-2007-4575 application
 
 # output
 
 # command to apply waiver
-
 
 import sys
 import csv
@@ -24,22 +32,14 @@ iqurl = sys.argv[1]
 iquser = sys.argv[2]
 iqpwd = sys.argv[3]
 
-# application_name = sys.argv[4]
-# stage = sys.argv[5]
-# policy_name = sys.argv[6]
-# package_url = sys.argv[7]
-# cve = sys.argv[8]
-# scope = sys.argv[9]
-
-application_name = 'webgoat'
-stage = 'build'
-policy_name = 'Security-Critical'
-package_url = 'pkg:maven/hsqldb/hsqldb@1.8.0.7?type=jar'
-cve = 'CVE-2007-4575'
-scope = 'application'
+application_name = sys.argv[4]
+stage = sys.argv[5]
+policy_name = sys.argv[6]
+package_url = sys.argv[7]
+cve = sys.argv[8]
+scope = sys.argv[9]
 
 csvfile = "list-of-violations.csv"
-
 
 def pretty_json(json_data):
   json_object = json.loads(json_data)
@@ -227,20 +227,20 @@ def get_waiver_cmd(application_public_id, policy_violation_id):
   root_organization = 'ROOT_ORGANIZATION_ID'
   waiver_api = '/api/v2/policyWaivers'
 
-  # if (scope == 'root'):
-  #   scope = 'organization/' + root_organization
-  # elif (scope == 'organization'):
-  #   scope = 'organization/' + application_public_id
-  # elif (scope == 'application'):
-  #   scope = 'application/' + application_public_id
-  # else:
-  #   return
+  if (scope == 'root'):
+    scope_tag = 'organization/' + root_organization
+  elif (scope == 'organization'):
+    scope_tag = 'organization/' + application_public_id
+  elif (scope == 'application'):
+    scope_tag = 'application/' + application_public_id
+  else:
+    return
 
   payload = get_waiver_payload()
 
   cmd = "curl -X POST -u " + iquser + ":" + iqpwd;
   cmd+= " -H \"Content-Type: application/json\" -d '" + payload + "'"
-  cmd+= " " + iqurl + waiver_api + "/" + scope + "/" + application_public_id + "/" + policy_violation_id
+  cmd+= " " + iqurl + waiver_api + "/" + scope_tag + "/" + policy_violation_id
 
   print (cmd)
 
@@ -253,7 +253,7 @@ def get_waiver_payload():
   waiver_duration = 30 # days
 
   expiry_date = datetime.datetime.today() + datetime.timedelta(days=waiver_duration)
-  expiry_date_fmt = expiry_date.strftime("%Y-%m-%dT%H:%M:%S.00.000+0000")
+  expiry_date_fmt = expiry_date.strftime("%Y-%m-%dT%H:%M:%S.000+0000")
 
   payload = {}
 
