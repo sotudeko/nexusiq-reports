@@ -20,6 +20,7 @@
 
 # command to apply waiver
 
+
 import sys
 import csv
 import requests
@@ -40,12 +41,6 @@ cve = sys.argv[8]
 scope = sys.argv[9]
 
 csvfile = "list-of-violations.csv"
-
-def pretty_json(json_data):
-  json_object = json.loads(json_data)
-  json_formatted_str = json.dumps(json_object, indent=2)
-  print(json_formatted_str)
-  return
 
 
 def get_nexusiq_data(iqapi):
